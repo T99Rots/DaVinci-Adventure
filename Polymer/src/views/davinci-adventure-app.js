@@ -15,6 +15,7 @@ import {
 } from '../actions/app';
 
 //importing components used by this page
+import '@polymer/paper-progress';
 import '../components/view-container';
 
 import sharedStyles from '../components/shared-styles';
@@ -26,13 +27,20 @@ class AdventureApp extends connect(store)(LitElement) {
 		return [
       sharedStyles,
       css`
-        
+        paper-progress {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          --paper-progress-active-color: var(--app-primary-color);
+        }
       `
     ]
 	}
 
 	render() {
-		return html`
+    return html`
+      <paper-progress ?hidden="${!this._loading}" indeterminate></paper-progress>
       <view-container page="${this._page.tagName? this._page.tagName: ''}"></view-container>
 		`
 	}
@@ -56,14 +64,16 @@ class AdventureApp extends connect(store)(LitElement) {
 
 	static get properties () {
 		return {
-			_page: Object,
-      _title: String
+			_page: { type: Object },
+      _title: { type: String },
+      _loading: { type: Boolean }
     }
 	}
 
 	stateChanged(state) {
     this._page = activePageSelector(state);
     this._title = this._page.title;
+    this._loading = state.app.appLoading;
   }
 }
 

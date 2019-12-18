@@ -2,7 +2,8 @@ import { createSelector } from 'reselect';
 
 import {
   NAVIGATE,
-  UPDATE_PAGES
+  UPDATE_PAGES,
+  UPDATE_LOADING
 } from '../actions/app';
 
 const initialState = {
@@ -10,7 +11,8 @@ const initialState = {
     id: 'INITIAL_PAGE',
     title: 'Loading...'
   }],
-	page: 'INITIAL_PAGE'
+  page: 'INITIAL_PAGE',
+  appLoading: false
 }
 
 const app = (state = initialState, action) => {
@@ -35,6 +37,11 @@ const app = (state = initialState, action) => {
         ...state,
         pages: action.pages
       };
+    case UPDATE_LOADING:
+      return {
+        ...state,
+        appLoading: action.loading
+      }
 		default:
 			return state;
 	}

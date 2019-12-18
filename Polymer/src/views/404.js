@@ -30,34 +30,6 @@ class Page404 extends PageViewElement {
           text-decoration: none;
           color: black;
         }
-				paper-button {
-          position: relative;
-          padding: 12px 44px;
-          font-size: 14px;
-          background: linear-gradient(193deg, rgb(0, 50, 255), rgb(0, 180, 255));
-          color: white;
-          border-radius: 21px;
-          transform-style: preserve-3d;
-          font-weight: 600;
-          font-size: 16px;
-        }
-        paper-button::before {
-          opacity: 0;
-          background: linear-gradient(193deg, rgb(0, 50, 255), rgb(0, 180, 255));
-          filter: blur(15px);
-          border-radius: 26px;
-          position: absolute;
-          top: -5px;
-          left: -5px;
-          bottom: -5px;
-          right: -5px;
-          content: '';
-          transform: translateZ(-1px);
-          transition: 0.3s opacity ease-out;
-        }
-        paper-button:hover::before {
-          opacity: 1;
-        }
         iron-icon {
           width: 60px;
           height: 60px;
@@ -71,7 +43,7 @@ class Page404 extends PageViewElement {
     return html`
       <iron-icon icon="error"></iron-icon>
 			<h1>Sorry, this page does not exist</h1>
-      <paper-button @click="${() => router.navigate('/')}">
+      <paper-button class="fancy-btn" @click="${() => router.navigate('/')}">
         Go to the home page
       </paper-button>
 		`
