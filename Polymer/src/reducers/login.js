@@ -8,7 +8,10 @@ import {
 const initialState = {
   accessCodeError: '',
   emailError: '',
-  step: 'start-screen'
+  step: 'code-login',
+  teamName: 'No team name found',
+  creatingTeam: false,
+  adventureName: 'No adventure name found'
 }
 
 const login = (state = initialState, action) => {
@@ -25,7 +28,11 @@ const login = (state = initialState, action) => {
       }
     case CHECK_ACCESS_CODE_SUCCESS:
       return {
-        ...state
+        ...state,
+        step: 'team',
+        adventureName: action.adventureName,
+        teamName: action.teamName,
+        creatingTeam: action.creatingTeam
       }
     case UPDATE_LOGIN_STEP:
       return {

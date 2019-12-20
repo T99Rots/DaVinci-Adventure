@@ -4,11 +4,12 @@ import { connect } from 'pwa-helpers/connect-mixin';
 
 import SharedStyles from '../components/shared-styles';
 
-import '@polymer/paper-input/paper-input';
+import '@material/mwc-textfield';
 import '@polymer/iron-icons'
 import '@polymer/paper-button';
 import '@polymer/paper-icon-button/paper-icon-button';
 import '../components/paper-pincode';
+import '../components/page-slider';
 
 import { store } from '../store';
 
@@ -19,7 +20,7 @@ store.addReducers({
 });
 
 import {
-  loginWithAccessCode,
+  checkAccessCode,
   resetAccessCodeError,
   updateLoginStep,
   loginWithEmail,
@@ -32,16 +33,18 @@ class LoginPage extends connect(store)(PageViewElement) {
       SharedStyles,
       css`
         :host {
+          position: relative;
           display: flex;
           align-items: center;
           flex-direction: column;
         }
 
-        .step {
+        page-slider > [slide] {
           display: flex;
           align-items: center;
           flex-direction: column;
           width: 100%;
+          padding-bottom: 80px;
         }
 
         h1 {
@@ -49,65 +52,15 @@ class LoginPage extends connect(store)(PageViewElement) {
           font-weight: 100;
         }
 
-        #access-code {
-          width: 230px;
-          border: none;
-          background: #eee;
-          height: 40px;
-          border-top-left-radius: 10px;
-          border-top-right-radius: 10px;
-          text-align: center;
-          font-size: 28px;
-          letter-spacing: 8px;
-          padding-left: 15px;
-          border-bottom: 1px solid #aaa;
-          font-family: Roboto;
-          color: #333;
-        }
-
-        #access-code:focus {
-          outline: none;
-        }
-
-        #access-code::placeholder {
-          letter-spacing: normal;
-          color: #ccc;
-          font-family: Roboto;
-          font-weight: 100;
-          font-size: 20px;
-          line-height: 43px;
-        }
-
-        #access-code-container {
-          position: relative;
-          overflow: hidden;
-        }
-
-        #access-code-container::after {
-          position: absolute;
-          height: 2px;
-          background: linear-gradient(193deg, #98cb95, #328f7f);
-          left: 0;
-          right: 0;
-          bottom: 0;
-          content: '';
-          transform: scaleX(0.0001);
-          transition: 0.225s transform;
-        }
-        
-        #access-code-container:focus-within::after {
-          transform: scaleX(1);
-        }
-
         .error {
-          color: #ff5a5a;
+          color: #db3535;
           font-weight: 500;
           width: calc(100% - 60px);
           text-align: center;
         }
 
         #back-button {
-          position: fixed;
+          position: absolute;
           top: 10px;
           left: 10px;
           color: #777;
@@ -118,30 +71,37 @@ class LoginPage extends connect(store)(PageViewElement) {
           opacity: 0;
         }
 
-        .step.start-screen p {
+        [slide=start-screen] p {
           color: #333;
         }
 
-        .step.email paper-input {
-          width: calc(100% - 60px);
-          --paper-input-container-focus-color: var(--app-primary-color);
+        [slide=team] p b {
+          color: var(--app-primary-color);
         }
 
-        #email-login-btn {
+        [slide=team] p {
+          width: calc(100% - 60px);
+          text-align: center;
+        }
+
+        mwc-textfield {
+          padding-top: 20px;
+          width: calc(100% - 60px);
+          --mdc-theme-primary: var(--app-primary-color);
+          --mdc-theme-error: #db3535;
+        }
+
+        paper-pincode {
+          --paper-pincode-active-color: var(--app-primary-color);
+          --paper-pincode-error-color: #db3535;
+        }
+
+        .login-btn {
           margin-top: 80px;
         }
 
         .next {
           margin-top: 40px;
-        }
-
-        @keyframes loading {
-          from {
-            background-position: 0 0%;
-          };
-          to {
-            background-position: 0 -100%;
-          };
         }
 			`
 		]
@@ -153,53 +113,84 @@ class LoginPage extends connect(store)(PageViewElement) {
         id="back-button"
         ?disabled="${this._step === 'start-screen'}"
         icon="arrow-back"
-        @click="${() => store.dispatch(updateLoginStep('start-screen'))}">
+        @click="${() => this._back()}">
       </paper-icon-button>
       <h1>
         Adventure App
       </h1>
-      <div class="step start-screen" ?hidden="${this._step !== 'start-screen'}">
-        <p>Log in via</p>
-        <paper-button class="primary-btn" @click="${() => store.dispatch(updateLoginStep('code-login'))}">
-          Toegangscode
-        </paper-button>
-        <p>of</p>
-        <paper-button class="secondary-btn" @click="${() => store.dispatch(updateLoginStep('email-login'))}">
-          Email
-        </paper-button>
-      </div>
-      <div class="step" ?hidden="${this._step !== 'code-login'}">
-        <div id="access-code-container">
-          <input
-            placeholder="Toegangscode"
-            name="access-code"
-            type="text"
-            pattern="\d*"
-            maxlength="6"
-            id="access-code"
-            spellcheck="none"
-            inputmode="numeric"
-            @input="${(e) => this._onCodeInput(e)}">
+      <page-slider selected="${this._step}">
+        <div slide="start-screen" index="0">
+          <p>Log in via</p>
+          <paper-button class="primary-btn" @click="${() => store.dispatch(updateLoginStep('code-login'))}">
+            Toegangscode
+          </paper-button>
+          <p>of</p>
+          <paper-button class="secondary-btn" @click="${() => store.dispatch(updateLoginStep('email-login'))}">
+            Email
+          </paper-button>
         </div>
-        <p class="error">${this._codeError}</p>
-        <paper-button 
-          class="fancy-btn next"
-          ?disabled="${!this._codeValid}"
-          @click="${() => this._loginWithCode()}">
-          Verzenden
-        </paper-button>
-      </div>
-      <div class="step email" ?hidden="${this._step !== 'email-login'}">
-        <paper-input @input="${() => this._onEmailInput()}" label="Email" id="email"></paper-input>
-        <paper-input @input="${() => this._onEmailInput()}" label="Wachtwoord" type="password" id="password"></paper-input>
-        <p class="error">${this._emailError}</p>
-        <paper-button 
-          class="fancy-btn"
-          id="email-login-btn"
-          ?disabled="${!this._emailValid}"
-          @click="${() => this._loginWithEmail()}">Login</paper-button>
-      </div>
+        <div slide="code-login" index="1">
+          <paper-pincode id="access-code" label="Toegangscode" @value-changed="${e => this._onCodeInput(e)}"></paper-pincode>
+          <p class="error">${this._codeError}</p>
+          <paper-button 
+            class="fancy-btn next"
+            ?disabled="${!this._codeValid}"
+            @click="${() => this._loginWithCode()}">
+            Verzenden
+          </paper-button>
+        </div>
+        <div slide="email-login" index="1">
+          <mwc-textfield
+            outlined
+            @input="${() => this._onEmailInput()}"
+            label="Email"
+            name="email"
+            id="email">
+          </mwc-textfield>
+          <mwc-textfield
+            outlined
+            @input="${() => this._onEmailInput()}"
+            label="Wachtwoord"
+            type="password"
+            id="password">
+          </mwc-textfield>
+          <p class="error">${this._emailError}</p>
+          <paper-button 
+            class="fancy-btn login-btn"
+            ?disabled="${!this._emailValid}"
+            @click="${() => this._loginWithEmail()}">Login</paper-button>
+        </div>
+        <div slide="team" index="2">
+          <p>${this._creatingTeam? 
+            html`Creëer een team en speel het adventure: <b>${this._adventureName}</b>`: 
+            html`Word lid van team <b>${this._teamName}</b> en speel het adventure: <b>${this._adventureName}</b>`}
+          </p>
+          <mwc-textfield 
+            ?hidden="${!this._creatingTeam}"
+            outlined
+            @input="${() => this._onTeamInput()}"
+            label="Team naam"
+            id="team-name">
+          </mwc-textfield>
+          <mwc-textfield
+            outlined
+            @input="${() => this._onTeamInput()}"
+            label="Jouw naam"
+            id="player-name">
+          </mwc-textfield>
+          <paper-button 
+            class="fancy-btn login-btn"
+            ?disabled="${!this._teamValid}">Start!</paper-button>
+        </div>
+      </page-slider>
 		`
+  }
+
+  _onTeamInput() {
+    const teamName = this.renderRoot.getElementById('team-name');
+    const playerName = this.renderRoot.getElementById('player-name');
+    
+    this._teamValid = (!this._creatingTeam || teamName.value.length > 1 ) && playerName.value.length > 1;
   }
 
   _onEmailInput() {
@@ -207,21 +198,17 @@ class LoginPage extends connect(store)(PageViewElement) {
     const email = this.renderRoot.getElementById('email');
     const password = this.renderRoot.getElementById('password');
 
-    if(this._emailRegex.test(email.value) && password.value.length > 0) {
-      this._emailValid = true;
-    } else {
-      this._emailValid = false;
-    }
+    this._emailValid = this._emailRegex.test(email.value) && password.value.length > 0;
   }
 
   _onCodeInput(e) {
     store.dispatch(resetAccessCodeError());
-    this._codeValid = /^\d{6,6}$/.test(e.path[0].value);
+    this._codeValid = e.detail.isValid;
   }
 
   _loginWithCode() {
     const accessCode = this.renderRoot.getElementById('access-code');
-    store.dispatch(loginWithAccessCode(accessCode.value));
+    store.dispatch(checkAccessCode(accessCode.value));
   }
 
   _loginWithEmail() {
@@ -230,13 +217,21 @@ class LoginPage extends connect(store)(PageViewElement) {
     store.dispatch(loginWithEmail(email.value, password.value));
   }
 
+  _back() {
+    store.dispatch(updateLoginStep(this._step === 'team'? 'code-login': 'start-screen'));
+  }
+
   static get properties () {
     return {
       _codeError: { type: String },
       _codeValid: { type: Boolean },
       _emailValid: { type: Boolean },
+      _teamValid: { type: Boolean },
       _emailError: { type: String },
-      _step: { type: String }
+      _step: { type: String },
+      _teamName: { type: String },
+      _creatingTeam: { type: Boolean },
+      _adventureName: { type: String }
     }
   }
 
@@ -257,6 +252,9 @@ class LoginPage extends connect(store)(PageViewElement) {
     this._codeError = state.login.accessCodeError;
     this._emailError = state.login.emailError;
     this._step = state.login.step;
+    this._creatingTeam = state.login.creatingTeam;
+    this._teamName = state.login.teamName;
+    this._adventureName = state.login.adventureName;
   }
 }
 

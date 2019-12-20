@@ -1,4 +1,5 @@
 export const CHECK_ACCESS_CODE_SUCCESS = 'CHECK_ACCESS_CODE_SUCCESS';
+export const CHECK_EMAIL_SUCCESS = 'CHECK_EMAIL_SUCCESS';
 export const SET_ACCESS_CODE_ERROR = 'SET_ACCESS_CODE_ERROR';
 export const UPDATE_LOGIN_STEP = 'UPDATE_LOGIN_STEP';
 export const SET_EMAIL_ERROR = 'SET_EMAIL_ERROR';
@@ -14,22 +15,32 @@ const emailRegex = new RegExp([
   '\\x0b\\x0c\\x0e-\\x7f])+)\\])'
 ].join(''));
 
-export const loginWithAccessCode = (accessCode) => async (dispatch, getState) => {
+const api = location.protocol + '//' + location.hostname + ':9001';
+
+export const checkAccessCode = (accessCode) => async (dispatch, getState) => {
   if(getState().app.appLoading) return;
   if(/^\d{6,6}$/.test(accessCode)) {
     try {
       dispatch(updateLoading(true));
-      const res = await fetch('http://localhost:9001/login/access-code', {
+      const res = await fetch(api + '/login/check-access-code', {
         method: 'POST',
         body: JSON.stringify({
           accessCode
-        })
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       dispatch(updateLoading(false));
   
       if(res.status === 200) {
+        const resBody = await res.json()
+
         dispatch({
-          type: CHECK_ACCESS_CODE_SUCCESS
+          type: CHECK_ACCESS_CODE_SUCCESS,
+          creatingTeam: resBody.type === 'create-team',
+          teamName: resBody.teamName,
+          adventureName: resBody.adventureName
         });
       } else if(res.status === 400) {
         dispatch(setAccessCodeError((await res.json()).error));
@@ -62,19 +73,23 @@ export const loginWithEmail = (email, password) => async (dispatch, getState) =>
   if(emailValid && passwordValid) {
     try {
       dispatch(updateLoading(true));
-      const res = await fetch('http://localhost:9001/login/email', {
+      const res = await fetch(api + '/login/email', {
         method: 'POST',
         body: JSON.stringify({
           email,
           password
-        })
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       dispatch(updateLoading(false));
   
       if(res.status === 200) {
         dispatch({
-          type: CHECK_ACCESS_CODE_SUCCESS
+          type: CHECK_EMAIL_SUCCESS
         });
+        console.log('potato')
       } else if(res.status === 400) {
         dispatch(setEmailError((await res.json()).error));
       } else {
