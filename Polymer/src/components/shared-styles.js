@@ -6,6 +6,9 @@ export default css`
     --app-secondary-color: #5ab4dd;
     font-family: Roboto;
   }
+  :host(.page) {
+    padding-top: 64px;
+  }
   paper-button.fancy-btn {
     position: relative;
     padding: 12px 44px;

@@ -4,6 +4,10 @@ class ViewContainer extends LitElement {
   static get styles () {
     return [
       css`
+        :host {
+          display: block;
+        }
+
         .page:not([active]) {
           display: none!important;
         }

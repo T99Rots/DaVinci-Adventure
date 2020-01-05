@@ -17,6 +17,12 @@ import {
 //importing components used by this page
 import '@polymer/paper-progress';
 import '../components/view-container';
+import '@polymer/app-layout/app-header/app-header';
+import '@polymer/app-layout/app-toolbar/app-toolbar';
+import '@polymer/app-layout/app-drawer/app-drawer';
+import '@polymer/paper-icon-button';
+import '@polymer/iron-icons';
+import '@polymer/iron-icon';
 
 import sharedStyles from '../components/shared-styles';
 
@@ -34,12 +40,32 @@ class AdventureApp extends connect(store)(LitElement) {
           width: 100vw;
           --paper-progress-active-color: var(--app-primary-color);
         }
+
+        app-header {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          text-align: center;
+          background-color: var(--app-header-background-color);
+          color: var(--app-header-text-color);
+          border-bottom: 1px solid #eee;
+          z-index: 999;
+          background: white;
+        }
       `
     ]
 	}
 
 	render() {
     return html`
+      <app-header condenses reveals effects="waterfall" ?hidden="${!this._header}">
+        <app-toolbar class="toolbar-top">
+          <paper-icon-button icon="menu"></paper-icon-button>          
+          <div main-title>${this._title}</div>
+          <paper-icon-button icon="search"></paper-icon-button>          
+        </app-toolbar>
+      </app-header>
       <paper-progress ?hidden="${!this._loading}" indeterminate></paper-progress>
       <view-container page="${this._page.tagName? this._page.tagName: ''}"></view-container>
 		`
@@ -66,7 +92,8 @@ class AdventureApp extends connect(store)(LitElement) {
 		return {
 			_page: { type: Object },
       _title: { type: String },
-      _loading: { type: Boolean }
+      _loading: { type: Boolean },
+      _header: { type: Boolean }
     }
 	}
 
@@ -74,6 +101,7 @@ class AdventureApp extends connect(store)(LitElement) {
     this._page = activePageSelector(state);
     this._title = this._page.title;
     this._loading = state.app.appLoading;
+    this._header = this._page.header;
   }
 }
 

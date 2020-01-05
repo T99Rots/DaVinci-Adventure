@@ -31,6 +31,7 @@ class PaperPincode extends LitElement {
         font-size: 14px;
         text-align: center;
         color: var(--paper-pincode-placeholder-color);
+        font-family: Roboto;
       }
       #container {
         display: flex;

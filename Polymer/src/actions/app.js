@@ -11,9 +11,6 @@ export const navigate = (page) => (dispatch) => {
     params: page.params,
     searchParams: page.searchParams
 	});
-
-  dispatch(updateDrawerState(false));
-  dispatch(updateCartState(false));
 }
 
 export const updatePages = (pages) => ({

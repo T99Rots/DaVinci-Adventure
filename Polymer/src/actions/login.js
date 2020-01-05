@@ -1,8 +1,25 @@
+import { router } from '../routes';
+
 export const CHECK_ACCESS_CODE_SUCCESS = 'CHECK_ACCESS_CODE_SUCCESS';
 export const CHECK_EMAIL_SUCCESS = 'CHECK_EMAIL_SUCCESS';
 export const SET_ACCESS_CODE_ERROR = 'SET_ACCESS_CODE_ERROR';
 export const UPDATE_LOGIN_STEP = 'UPDATE_LOGIN_STEP';
 export const SET_EMAIL_ERROR = 'SET_EMAIL_ERROR';
+export const SET_TEAM_ERROR = 'SET_TEAM_ERROR';
+
+const errors = {
+  LOGIN_FAILED: 'Er is een fout opgetreden tijdens het inloggen',
+  ACCESS_CODE_CHECK_FAILED: 'Er is een fout opgetreden tijdens het checken van de toegangscode',
+  ACCESS_CODE_ONLY_NUMBER: 'Code mag alleen nummers bevatten',
+  ACCESS_CODE_TO_SHORT: 'Code moet minimaal 6 nummers lang zijn',
+  ACCESS_CODE_TO_SHOT_AND_ONLY_NUMBERS: 'Code moet minimaal 6 nummers lang zijn en alleen nummers bevatten',
+  PASSWORD_INVALID: 'Opgegeven wachtwoord is niet valide',
+  EMAIL_INVALID: 'Opgegeven email is niet valide',
+  EMAIL_AND_PASSWORD_INVALID: 'Opgegeven wachtwoord en email zijn niet valide',
+  NAME_REQUIRED: 'Naam is verplicht',
+  TEAM_NAME_REQUIRED: 'Team naam is verplicht',
+  TEAM_AND_NAME_REQUIRED: 'Naam en team naam zijn verplicht'
+}
 
 import { updateLoading } from './app';
 
@@ -17,6 +34,61 @@ const emailRegex = new RegExp([
 
 const api = location.protocol + '//' + location.hostname + ':9001';
 
+export const loginWithAccessCode = (name, teamName) => async (dispatch, getState) => {
+  const state = getState();
+  
+  if(state.app.appLoading) return;
+  
+  if(name.length > 0 && (!state.login.creatingTeam || teamName.length > 0)) {
+    try {
+      dispatch(updateLoading(true));
+      const body = {
+        accessCode: state.login.accessCode,
+        name
+      }
+      if(state.login.creatingTeam) body.teamName = teamName;
+      const res = await fetch(api + '/login/access-code', {
+        method: 'POST',
+        body: JSON.stringify(body),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      dispatch(updateLoading(false));
+  
+      if(res.status > 199 && res.status < 300) {
+        const { token, userId, loginType, permissions } = await res.json();
+        Object.assign(localStorage, {
+          token,
+          userId,
+          loginType,
+          permissions: JSON.stringify(permissions),
+          loggedIn: true
+        });
+        router.navigateId('dashboard');
+      } else if(res.status === 400) {
+        dispatch(setTeamError((await res.json()).message));
+      } else {
+        dispatch(setTeamError(errors.LOGIN_FAILED));
+      }
+    } catch(e) {
+      console.error(e);
+      dispatch(updateLoading(false));
+      dispatch(setTeamError(errors.LOGIN_FAILED));
+    }
+  } else {
+    const nameValid = name.length > 0;
+    const teamValid = (!state.login.creatingTeam || teamName.length > 0);
+    if(!nameValid && teamValid) {
+      dispatch(setTeamError(errors.NAME_REQUIRED));
+    } else if (nameValid && !teamValid) {
+      dispatch(setTeamError(errors.TEAM_NAME_REQUIRED));
+    } else {
+      dispatch(setTeamError(errors.TEAM_AND_NAME_REQUIRED));
+    }
+  }
+}
+
 export const checkAccessCode = (accessCode) => async (dispatch, getState) => {
   if(getState().app.appLoading) return;
   if(/^\d{6,6}$/.test(accessCode)) {
@@ -25,7 +97,7 @@ export const checkAccessCode = (accessCode) => async (dispatch, getState) => {
       const res = await fetch(api + '/login/check-access-code', {
         method: 'POST',
         body: JSON.stringify({
-          accessCode
+          accessCode: +accessCode
         }),
         headers: {
           'Content-Type': 'application/json'
@@ -40,26 +112,28 @@ export const checkAccessCode = (accessCode) => async (dispatch, getState) => {
           type: CHECK_ACCESS_CODE_SUCCESS,
           creatingTeam: resBody.type === 'create-team',
           teamName: resBody.teamName,
-          adventureName: resBody.adventureName
+          adventureName: resBody.adventureName,
+          accessCode: +accessCode
         });
       } else if(res.status === 400) {
-        dispatch(setAccessCodeError((await res.json()).error));
+        dispatch(setAccessCodeError((await res.json()).message));
       } else {
-        dispatch(setAccessCodeError('Er is een fout opgetreden tijdens het checken van de toegangscode'));
+        dispatch(setAccessCodeError(errors.ACCESS_CODE_CHECK_FAILED));
       }
     } catch(e) {
+      console.error(e);
       dispatch(updateLoading(false));
-      dispatch(setAccessCodeError('Er is een fout opgetreden tijdens het checken van de toegangscode'));
+      dispatch(setAccessCodeError(errors.ACCESS_CODE_CHECK_FAILED));
     }
   } else {
     const hasNonNumbers = !/^\d*$/.test(accessCode);
     const toLittleChars = accessCode.length < 6;
     if(hasNonNumbers && !toLittleChars) {
-      dispatch(setAccessCodeError('Code mag alleen nummers bevatten'));
+      dispatch(setAccessCodeError(errors.ACCESS_CODE_ONLY_NUMBER));
     } else if (!hasNonNumbers && toLittleChars) {
-      dispatch(setAccessCodeError('Code moet minimaal 6 nummers lang zijn'));
+      dispatch(setAccessCodeError(errors.ACCESS_CODE_TO_SHORT));
     } else {
-      dispatch(setAccessCodeError('Code moet minimaal 6 nummers lang zijn en alleen nummers bevatten'));
+      dispatch(setAccessCodeError(errors.ACCESS_CODE_TO_SHOT_AND_ONLY_NUMBERS));
     }
   }
 }
@@ -86,26 +160,32 @@ export const loginWithEmail = (email, password) => async (dispatch, getState) =>
       dispatch(updateLoading(false));
   
       if(res.status === 200) {
-        dispatch({
-          type: CHECK_EMAIL_SUCCESS
+        const { token, userId, loginType, permissions } = await res.json();
+        Object.assign(localStorage, { 
+          token,
+          userId,
+          loginType,
+          permissions: JSON.stringify(permissions),
+          loggedIn: true
         });
-        console.log('potato')
+        router.navigateId('dashboard');
       } else if(res.status === 400) {
-        dispatch(setEmailError((await res.json()).error));
+        dispatch(setEmailError((await res.json()).message));
       } else {
-        dispatch(setEmailError('Er is een fout opgetreden tijdens het inloggen'));
+        dispatch(setEmailError(errors.LOGIN_FAILED));
       }
     } catch(e) {
+      console.error(e);
       dispatch(updateLoading(false));
-      dispatch(setEmailError('Er is een fout opgetreden tijdens het inloggen'));
+      dispatch(setEmailError(errors.LOGIN_FAILED));
     }
   } else {
     if(emailValid && !passwordValid) {
-      dispatch(setEmailError('Opgegeven wachtwoord is niet valide'));
+      dispatch(setEmailError(errors.PASSWORD_INVALID));
     } else if (!emailValid && passwordValid) {
-      dispatch(setEmailError('Opgegeven email is niet valide'));
+      dispatch(setEmailError(errors.EMAIL_INVALID));
     } else {
-      dispatch(setEmailError('Opgegeven wachtwoord en email zijn niet valide'));
+      dispatch(setEmailError(errors.EMAIL_AND_PASSWORD_INVALID));
     }
   }
 }
@@ -129,6 +209,11 @@ const setAccessCodeError = (error) => ({
 
 const setEmailError = (error) => ({
   type: SET_EMAIL_ERROR,
+  error
+});
+
+const setTeamError = (error) => ({
+  type: SET_TEAM_ERROR,
   error
 });
 

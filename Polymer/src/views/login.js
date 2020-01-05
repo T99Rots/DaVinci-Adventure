@@ -24,7 +24,8 @@ import {
   resetAccessCodeError,
   updateLoginStep,
   loginWithEmail,
-  resetEmailError
+  resetEmailError,
+  loginWithAccessCode
 } from '../actions/login';
 
 class LoginPage extends connect(store)(PageViewElement) {
@@ -48,7 +49,7 @@ class LoginPage extends connect(store)(PageViewElement) {
         }
 
         h1 {
-          margin: 90px 0;
+          margin: 26px 0;
           font-weight: 100;
         }
 
@@ -130,12 +131,17 @@ class LoginPage extends connect(store)(PageViewElement) {
           </paper-button>
         </div>
         <div slide="code-login" index="1">
-          <paper-pincode id="access-code" label="Toegangscode" @value-changed="${e => this._onCodeInput(e)}"></paper-pincode>
+          <paper-pincode 
+            id="access-code"
+            label="Toegangscode"
+            @value-changed="${e => this._onCodeInput(e)}"
+            @keyup="${e => this._keyUp(e, 'code')}">
+          </paper-pincode>
           <p class="error">${this._codeError}</p>
           <paper-button 
             class="fancy-btn next"
             ?disabled="${!this._codeValid}"
-            @click="${() => this._loginWithCode()}">
+            @click="${() => this._checkAccessCode()}">
             Verzenden
           </paper-button>
         </div>
@@ -152,7 +158,8 @@ class LoginPage extends connect(store)(PageViewElement) {
             @input="${() => this._onEmailInput()}"
             label="Wachtwoord"
             type="password"
-            id="password">
+            id="password"
+            @keyup="${e => this._keyUp(e, 'email')}">
           </mwc-textfield>
           <p class="error">${this._emailError}</p>
           <paper-button 
@@ -176,10 +183,13 @@ class LoginPage extends connect(store)(PageViewElement) {
             outlined
             @input="${() => this._onTeamInput()}"
             label="Jouw naam"
-            id="player-name">
+            id="player-name"
+            @keyup="${e => this._keyUp(e, 'team')}">
           </mwc-textfield>
+          <p class="error">${this._teamError}</p>
           <paper-button 
             class="fancy-btn login-btn"
+            @click="${() => this._loginWithAccessCode()}"
             ?disabled="${!this._teamValid}">Start!</paper-button>
         </div>
       </page-slider>
@@ -190,7 +200,7 @@ class LoginPage extends connect(store)(PageViewElement) {
     const teamName = this.renderRoot.getElementById('team-name');
     const playerName = this.renderRoot.getElementById('player-name');
     
-    this._teamValid = (!this._creatingTeam || teamName.value.length > 1 ) && playerName.value.length > 1;
+    this._teamValid = (!this._creatingTeam || teamName.value.length > 0 ) && playerName.value.length > 0;
   }
 
   _onEmailInput() {
@@ -206,14 +216,45 @@ class LoginPage extends connect(store)(PageViewElement) {
     this._codeValid = e.detail.isValid;
   }
 
-  _loginWithCode() {
+  _keyUp(e, type) {
+    if(e.key === 'Enter') {
+      switch(type) {
+        case 'code':
+          if(this._codeValid) this._checkAccessCode();
+          return;
+        case 'email':
+          if(this._emailValid) this._loginWithEmail();
+          return;
+        case 'team':
+          if(this._teamValid) this._loginWithAccessCode();
+          return;
+      }
+    };
+  }
+
+  _checkAccessCode() {
     const accessCode = this.renderRoot.getElementById('access-code');
+    accessCode.blur();
+
     store.dispatch(checkAccessCode(accessCode.value));
+  }
+
+  _loginWithAccessCode() {
+    const teamName = this.renderRoot.getElementById('team-name');
+    const playerName = this.renderRoot.getElementById('player-name');
+    playerName.blur();
+    teamName.blur();
+
+    store.dispatch(loginWithAccessCode(playerName.value, teamName.value));
   }
 
   _loginWithEmail() {
     const email = this.renderRoot.getElementById('email');
     const password = this.renderRoot.getElementById('password');
+
+    email.blur();
+    password.blur();
+
     store.dispatch(loginWithEmail(email.value, password.value));
   }
 
@@ -231,7 +272,8 @@ class LoginPage extends connect(store)(PageViewElement) {
       _step: { type: String },
       _teamName: { type: String },
       _creatingTeam: { type: Boolean },
-      _adventureName: { type: String }
+      _adventureName: { type: String },
+      _teamError: { type: String }
     }
   }
 
@@ -251,6 +293,7 @@ class LoginPage extends connect(store)(PageViewElement) {
   stateChanged(state) {
     this._codeError = state.login.accessCodeError;
     this._emailError = state.login.emailError;
+    this._teamError = state.login.teamError;
     this._step = state.login.step;
     this._creatingTeam = state.login.creatingTeam;
     this._teamName = state.login.teamName;

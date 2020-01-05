@@ -7,9 +7,11 @@ const router = window.router = new Router({
     title: ({id}) => id[0].toLocaleUpperCase()+id.substr(1).toLocaleLowerCase(),
     script: ({id}) => `../views/${id}.js`,
     tagName: a => a.id ? `${a.id}-page` : false,
+    redirect: () => localStorage.getItem('loggedIn')? false: { id: 'login' },
+    header: true
   },
   root: {
-    id: 'home',
+    id: 'root',
     redirect: {
       id: 'dashboard'
     }
@@ -21,7 +23,9 @@ const router = window.router = new Router({
   },
   routes: {
 		login: {
-      id: 'login'
+      id: 'login',
+      redirect: () => localStorage.getItem('loggedIn')? { id: 'root' }: false,
+      header: false
     },
     dashboard: {
       id: 'dashboard'
