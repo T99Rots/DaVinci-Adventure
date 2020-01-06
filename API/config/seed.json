@@ -1,0 +1,14 @@
+{
+  "seeders": [
+    "users",
+    "adventure-template"
+  ],
+  "templates": {
+    "count": { "min": 20, "max": 35 },
+    "questions": { "min": 7, "max": 15 },
+    "choices": { "min": 2, "max": 5 }
+  },
+  "users": {
+    "defaultAdminPassword": "welcome123"
+  }
+}

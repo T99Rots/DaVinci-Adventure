@@ -65,7 +65,7 @@ export const loginWithAccessCode = (name, teamName) => async (dispatch, getState
           permissions: JSON.stringify(permissions),
           loggedIn: true
         });
-        router.navigateId('dashboard');
+        router.navigateId('root');
       } else if(res.status === 400) {
         dispatch(setTeamError((await res.json()).message));
       } else {
@@ -168,7 +168,7 @@ export const loginWithEmail = (email, password) => async (dispatch, getState) =>
           permissions: JSON.stringify(permissions),
           loggedIn: true
         });
-        router.navigateId('dashboard');
+        router.navigateId('root');
       } else if(res.status === 400) {
         dispatch(setEmailError((await res.json()).message));
       } else {

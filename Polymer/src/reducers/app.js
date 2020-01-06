@@ -3,7 +3,8 @@ import { createSelector } from 'reselect';
 import {
   NAVIGATE,
   UPDATE_PAGES,
-  UPDATE_LOADING
+  UPDATE_LOADING,
+  UPDATE_DRAWER
 } from '../actions/app';
 
 const initialState = {
@@ -12,7 +13,8 @@ const initialState = {
     title: 'Loading...'
   }],
   page: 'INITIAL_PAGE',
-  appLoading: false
+  appLoading: false,
+  drawerOpened: false
 }
 
 const app = (state = initialState, action) => {
@@ -41,6 +43,11 @@ const app = (state = initialState, action) => {
       return {
         ...state,
         appLoading: action.loading
+      }
+    case UPDATE_DRAWER:
+      return {
+        ...state,
+        drawerOpened: action.opened
       }
 		default:
 			return state;

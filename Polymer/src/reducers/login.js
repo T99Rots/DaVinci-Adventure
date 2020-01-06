@@ -10,7 +10,7 @@ const initialState = {
   accessCodeError: '',
   emailError: '',
   teamError: '',
-  step: 'code-login',
+  step: 'start-screen',
   teamName: 'No team name found',
   creatingTeam: false,
   adventureName: 'No adventure name found',

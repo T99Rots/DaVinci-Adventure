@@ -12,9 +12,9 @@ const router = window.router = new Router({
   },
   root: {
     id: 'root',
-    redirect: {
-      id: 'dashboard'
-    }
+    redirect: () => ({
+      id: localStorage.getItem('loginType') === 'admin'? 'templates': 'game-dashboard'
+    })
   },
   404: {
     tagName: 'page-404',
@@ -27,8 +27,19 @@ const router = window.router = new Router({
       redirect: () => localStorage.getItem('loggedIn')? { id: 'root' }: false,
       header: false
     },
-    dashboard: {
-      id: 'dashboard'
+    templates: {
+      id: 'templates',
+      title: 'Game Templates',
+      subRoutes: {
+        ':templateId': {
+          id: 'template',
+          title: 'Template'
+        }
+      } 
+    },
+    'game-dashboard': {
+      id: 'game-dashboard',
+
     }
   }
 });

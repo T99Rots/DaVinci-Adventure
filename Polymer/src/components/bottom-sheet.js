@@ -33,11 +33,15 @@ class BottomSheet extends LitElement {
           right: 0;
           bottom: 0;
           background: white;
-          border-top-right-radius: 5px;
-          border-top-left-radius: 5px;
+          border-top-right-radius: 8px;
+          border-top-left-radius: 8px;
           transition: transform var(--toggle-transition);
           transform: translateY(100%);
           overflow: hidden;
+          box-shadow: 
+            0 6px 10px 0 rgba(0, 0, 0, 0.14),
+            0 1px 18px 0 rgba(0, 0, 0, 0.12),
+            0 3px 5px -1px rgba(0, 0, 0, 0.4)
         }
         #container[opened] #sheet {
           transform: translateY(0%);

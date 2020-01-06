@@ -1,39 +1,18 @@
-const yargs = require('yargs');
+console.clear()
+
+const mongoose = require('mongoose');
+const config = require('./config/default.json');
+const seedConfig = require('./config/seed.json');
+const path = require('path');
 
 (async () => {
-  const dbModule = require('./db');
-  // const fs = require('fs');
-  const path = require('path');
-  
-  await dbModule.connect();
-  const db = dbModule.db;
+  await mongoose.connect(config.mongoURL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
 
-  // can be clean or random
-  const mode = yargs.argv.mode || 'clean';
-
-  const seeders = [
-    'categories',
-    'products',
-    'users',
-    'orders',    
-    'reviews'
-  ]
-
-  const ctx = {
-    data: {},
-    mode
-  }
-
-  for(const seeder of seeders) {
-    ctx.data[seeder] = await require(path.join(__dirname, './seed/', seeder)).seed(ctx);
-  }
-
-  for(const collectionName of seeders) {
-    if(Array.isArray(ctx.data[collectionName]) && ctx.data[collectionName].length > 0) {
-      await db.collection(collectionName).bulkWrite(ctx.data[collectionName].map(doc => ({
-        insertOne: doc
-      })));
-    }
+  for(const seeder of seedConfig.seeders) {
+    await require(path.join(__dirname, './seed/', seeder))();
   }
 
   console.log('Seeding completed!');

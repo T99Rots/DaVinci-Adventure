@@ -1,4 +1,11 @@
 {
   "mongoURL": "mongodb://localhost:27017/davinci-adventure",
-  "port": "5000"
+  "port": 5000,
+  "codeLength": 6,
+  "allowedDomains": [
+    "http://localhost:9001",
+    "http://localhost:9000",
+    "https://localhost:9001",
+    "https://localhost:9000"
+  ]
 }

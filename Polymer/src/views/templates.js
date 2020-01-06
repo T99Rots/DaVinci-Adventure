@@ -28,7 +28,7 @@ import {
   updateBottomSheet
 } from '../actions/templates'
 
-class DashboardPage extends connect(store)(PageViewElement) {
+class TemplatesPage extends connect(store)(PageViewElement) {
 	static get styles() {
 		return [
       SharedStyles,
@@ -85,15 +85,24 @@ class DashboardPage extends connect(store)(PageViewElement) {
         bottom-sheet hr {
           border-color: rgba(0,0,0,0.1);
           border-width: 1px;
+          border-bottom: none;
           margin: 0;
         }
 
         bottom-sheet h3 {
           margin: 0;
-          line-height: 52px;
-          padding-left: 20px;
-          font-weight: 400;
+          line-height: 48px;
+          padding: 0 20px;
+          font-weight: 500;
           font-size: 16px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          color: #888;
+        }
+
+        paper-listbox {
+          padding-top: 0;
         }
 			`
 		]
@@ -119,7 +128,15 @@ class DashboardPage extends connect(store)(PageViewElement) {
           <paper-item>
             <paper-item-body two-line>
               <div>${template.name}</div>
-              <div secondary>Gemaakt door</div>
+              <div secondary>
+                Gemaakt door ${template.userCreated}
+                op ${template.dateCreated.toLocaleString('nl', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  day: 'numeric',
+                  month: 'short'
+                })}
+              </div>
             </paper-item-body>
             <paper-icon-button 
               icon="more-vert"
@@ -175,4 +192,4 @@ class DashboardPage extends connect(store)(PageViewElement) {
   }
 }
 
-window.customElements.define('dashboard-page', DashboardPage);
+window.customElements.define('templates-page', TemplatesPage);

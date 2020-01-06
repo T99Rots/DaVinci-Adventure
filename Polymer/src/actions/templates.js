@@ -18,7 +18,10 @@ export const getTemplates = () => async (dispatch) => {
     if(res.status >= 200 && res.status < 300) {
       dispatch({
         type: GET_TEMPLATES,
-        templates: await res.json()
+        templates: (await res.json()).map(template => ({
+          ...template,
+          dateCreated: new Date(template.dateCreated)
+        }))
       });
     } else {
       dispatch({
