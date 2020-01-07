@@ -3,13 +3,12 @@ const Schema = mongoose.Schema;
 const ObjectId = mongoose.Types.ObjectId;
 
 const permissions = {
-  CREATE_ADVENTURE: 'CREATE_ADVENTURE',
   START_ADVENTURE: 'START_ADVENTURE',
   VIEW_TEMPLATES: 'VIEW_TEMPLATES',
   MANAGE_TEMPLATES: 'MANAGE_TEMPLATES'
 }
 
-const UsersSchema = new Schema({
+const UserSchema = new Schema({
   _id: { type: Schema.ObjectId, default: ObjectId },
   email: { type: String, required: true },
   name: { type: String, required: true },
@@ -20,7 +19,7 @@ const UsersSchema = new Schema({
   tokens: []
 });
 
-module.exports = class Users extends mongoose.model('Users', UsersSchema) {
+module.exports = class User extends mongoose.model('User', UserSchema) {
   static permissions = permissions;
 
   async addToken (token) {

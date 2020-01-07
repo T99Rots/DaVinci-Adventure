@@ -22,6 +22,7 @@ const errors = {
 }
 
 import { updateLoading } from './app';
+import { initAdventure } from '../actions/adventure';
 
 const emailRegex = new RegExp([
   '(?:[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08',
@@ -47,7 +48,7 @@ export const loginWithAccessCode = (name, teamName) => async (dispatch, getState
         name
       }
       if(state.login.creatingTeam) body.teamName = teamName;
-      const res = await fetch(api + '/login/access-code', {
+      const res = await fetch(api + '/adventure/join', {
         method: 'POST',
         body: JSON.stringify(body),
         headers: {
@@ -57,19 +58,26 @@ export const loginWithAccessCode = (name, teamName) => async (dispatch, getState
       dispatch(updateLoading(false));
   
       if(res.status > 199 && res.status < 300) {
-        const { token, userId, loginType, permissions } = await res.json();
+        const { 
+          token,
+          userId,
+          loginType,
+          teamName: teamName1 = teamName,
+          accessCode,
+          questions
+         } = await res.json();
         Object.assign(localStorage, {
           token,
           userId,
           loginType,
-          permissions: JSON.stringify(permissions),
-          loggedIn: true
+          loggedIn: true,
+          teamName1,
+          questions: JSON.stringify(questions)
         });
+        dispatch(initAdventure(teamName1, loginType, questions, accessCode))
         router.navigateId('root');
-      } else if(res.status === 400) {
-        dispatch(setTeamError((await res.json()).message));
       } else {
-        dispatch(setTeamError(errors.LOGIN_FAILED));
+        dispatch(setTeamError((await res.json()).message));
       }
     } catch(e) {
       console.error(e);
@@ -94,7 +102,7 @@ export const checkAccessCode = (accessCode) => async (dispatch, getState) => {
   if(/^\d{6,6}$/.test(accessCode)) {
     try {
       dispatch(updateLoading(true));
-      const res = await fetch(api + '/login/check-access-code', {
+      const res = await fetch(api + '/adventure/check-access-code', {
         method: 'POST',
         body: JSON.stringify({
           accessCode: +accessCode

@@ -5,7 +5,7 @@ const ObjectId = mongoose.Types.ObjectId;
 const AdventureTemplateSchema = new Schema({
   _id: { type: Schema.ObjectId, default: ObjectId },
   dateCreated: { type: Date, default: () => new Date, required: true },
-  userCreated: { type: Schema.ObjectId, required: true, ref: 'Users' },
+  userCreated: { type: Schema.ObjectId, required: true, ref: 'User' },
   published: { type: Boolean, default: false, required: true },
   name: { type: String, required: true },
   questions: [{
@@ -23,8 +23,4 @@ const AdventureTemplateSchema = new Schema({
   }]
 });
 
-module.exports = class AdventureTemplate extends mongoose.model('AdventureTemplate', AdventureTemplateSchema) {
-  addQuestion(question) {
-    this.questions.push(question);
-  }
-}
+module.exports = mongoose.model('AdventureTemplate', AdventureTemplateSchema);

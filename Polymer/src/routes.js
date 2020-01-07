@@ -13,7 +13,7 @@ const router = window.router = new Router({
   root: {
     id: 'root',
     redirect: () => ({
-      id: localStorage.getItem('loginType') === 'admin'? 'templates': 'game-dashboard'
+      id: localStorage.getItem('loginType') === 'admin'? 'templates': 'adventure'
     })
   },
   404: {
@@ -37,9 +37,11 @@ const router = window.router = new Router({
         }
       } 
     },
-    'game-dashboard': {
-      id: 'game-dashboard',
-
+    'adventure-admin-dashboard': {
+      id: 'adventure-admin-dashboard'
+    },
+    'adventure': {
+      id: 'adventure'
     }
   }
 });

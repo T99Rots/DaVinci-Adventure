@@ -25,7 +25,8 @@ store.addReducers({
 import {
   getTemplates,
   updateSelectedTemplate,
-  updateBottomSheet
+  updateBottomSheet,
+  startAdventure
 } from '../actions/templates'
 
 class TemplatesPage extends connect(store)(PageViewElement) {
@@ -156,7 +157,7 @@ class TemplatesPage extends connect(store)(PageViewElement) {
         <h3>${this._selectedTemplate && this._selectedTemplate.name}</h3>
         <hr>
         <paper-listbox>
-          <paper-icon-item>
+          <paper-icon-item @click="${() => store.dispatch(startAdventure(this._selectedTemplate._id))}">
             <iron-icon icon="av:play-arrow" slot="item-icon"></iron-icon>  
             Start adventure
           </paper-icon-item>

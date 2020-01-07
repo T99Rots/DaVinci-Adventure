@@ -14,9 +14,11 @@ import '../components/page-slider';
 import { store } from '../store';
 
 import login from '../reducers/login';
+import adventure from '../reducers/adventure'
 
 store.addReducers({
-  login
+  login,
+  adventure
 });
 
 import {

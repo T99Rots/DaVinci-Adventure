@@ -14,6 +14,8 @@ router.get('/', async (ctx, next) => {
     userCreated: template.userCreated.name,
     dateCreated: template.dateCreated
   }));
+
+  await next();
 });
 
 module.exports = router;

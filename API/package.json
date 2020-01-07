@@ -20,6 +20,7 @@
     "koa-bodyparser": "^4.2.1",
     "koa-compose": "^4.1.0",
     "koa-router": "^7.4.0",
+    "lodash": "^4.17.15",
     "mongoose": "^5.8.1"
   },
   "devDependencies": {

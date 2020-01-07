@@ -29,6 +29,7 @@ const errorHandler = require('koa-better-error-handler');
   app.use(cors({
     origins: /^https?:\/\/(localhost|192\.168\.0\.4):900[10]$/
   }));
+  app.use(require('./helpers/permissions').userMiddleware);
 
   const router = new Router();
 

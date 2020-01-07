@@ -52,43 +52,6 @@ router.post('/email', async (ctx, next) => {
   await next();
 });
 
-router.post('/check-access-code', (ctx, next) => {
-  const accessCode = ctx.request.body.accessCode;
-
-  if(accessCode === 123456) {
-    ctx.status = 200;
-    ctx.body = {
-      type: 'join-team',
-      teamName: 'team1',
-      adventureName: 'Kennismaking speurtocht'
-    };
-  } else if (accessCode === 222222) {
-    ctx.status = 200;
-    ctx.body = {
-      type: 'create-team',
-      adventureName: 'Kennismaking speurtocht'
-    };
-  } else {
-    ctx.status = 400;
-    ctx.response.body = JSON.stringify({
-      error: 'Invalid code'
-    });
-  }
-  next();
-});
-
-router.post('/access-code', async (ctx, next) => {
-  ctx.body = {
-    token: generateToken()
-  };
-
-  if(ctx.request.body.accessCode === 222222) {
-    ctx.body.teamAccessCode = await generateAccessCode();
-  }
-
-  await next();
-})
-
 router.post('/logout', async (ctx, next) => {
   
 });

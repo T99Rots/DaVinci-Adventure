@@ -4,7 +4,8 @@ import {
   GET_TEMPLATES,
   GET_TEMPLATES_FAILED,
   UPDATE_BOTTOM_SHEET,
-  UPDATE_SELECTED_TEMPLATE
+  UPDATE_SELECTED_TEMPLATE,
+  START_ADVENTURE
 } from '../actions/templates';
 
 const initialState = {
@@ -12,7 +13,8 @@ const initialState = {
   templatesError: '',
   initialized: false,
   bottomSheetOpened: false,
-  selectedTemplate: ''
+  selectedTemplate: '',
+  accessCode: ''
 }
 
 const templates = (state = initialState, action) => {
@@ -39,6 +41,11 @@ const templates = (state = initialState, action) => {
         bottomSheetOpened: true,
         selectedTemplate: action.template
       };
+    case START_ADVENTURE:
+      return {
+        ...state,
+        accessCode: action.accessCode
+      }
     default:
       return state;
   }
