@@ -41,7 +41,8 @@ const router = window.router = new Router({
       id: 'adventure-admin-dashboard'
     },
     'adventure': {
-      id: 'adventure'
+      id: 'adventure',
+      header: false
     }
   }
 });

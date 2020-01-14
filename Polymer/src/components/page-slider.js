@@ -61,8 +61,8 @@ class PageSlider extends LitElement {
       }
 
       const w = this.clientWidth;
-      const sp = this._selected.getClientRects()[0].x;
-      const ep = elem.getClientRects()[0].x;
+      const sp = (this._selected.getClientRects()[0] || {}).x || 0;
+      const ep = (elem.getClientRects()[0] || {}).x || 0;
 
       const so = sp === 0? 0: (w / sp) * 100;
       const eo = ep === 0? 0: (w / ep) * 100;

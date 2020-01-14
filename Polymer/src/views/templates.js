@@ -79,6 +79,10 @@ class TemplatesPage extends connect(store)(PageViewElement) {
           width: 115px;
         }
 
+        bottom-sheet {
+          user-select: none;
+        }
+
         bottom-sheet iron-icon {
           color: rgba(0, 0, 0, 0.6);
         }
@@ -157,7 +161,7 @@ class TemplatesPage extends connect(store)(PageViewElement) {
         <h3>${this._selectedTemplate && this._selectedTemplate.name}</h3>
         <hr>
         <paper-listbox>
-          <paper-icon-item @click="${() => store.dispatch(startAdventure(this._selectedTemplate._id))}">
+          <paper-icon-item @click="${() => this._startAdventure()}">
             <iron-icon icon="av:play-arrow" slot="item-icon"></iron-icon>  
             Start adventure
           </paper-icon-item>
@@ -170,6 +174,11 @@ class TemplatesPage extends connect(store)(PageViewElement) {
 		`
   }
   
+  _startAdventure() {
+    store.dispatch(startAdventure(this._selectedTemplate._id));
+    store.dispatch(updateBottomSheet(false));
+  }
+
   firstUpdated() {
     store.dispatch(getTemplates());
   }
