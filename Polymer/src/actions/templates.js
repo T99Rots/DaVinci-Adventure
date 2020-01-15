@@ -44,7 +44,7 @@ export const getTemplates = () => async (dispatch) => {
 
 export const startAdventure = (templateId) => async (dispatch) => {
   try {
-    dispatch(updateLoading(true));
+    dispatch(updateLoading(true));    
     const res = await apiRequest('adventure/start', {
       method: 'POST',
       body: {

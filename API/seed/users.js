@@ -12,12 +12,7 @@ module.exports = async () => {
   await User.create({
     email: 'admin@davinci.local',
     passwordHash: await bcrypt.hash(seedConfig.users.defaultAdminPassword, saltRounds),
-    permissions: [
-      User.permissions.CREATE_ADVENTURE,
-      User.permissions.MANAGE_TEMPLATES,
-      User.permissions.START_ADVENTURE,
-      User.permissions.VIEW_TEMPLATES,
-    ],
+    permissions: Object.values(User.permissions),
     name: 'Admin'
   });
 };
