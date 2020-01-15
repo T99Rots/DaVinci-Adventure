@@ -1,5 +1,6 @@
 import {
-  INIT_ADVENTURE
+  INIT_ADVENTURE,
+  UPDATE_ADVENTURE_TAB
 } from '../actions/adventure';
 
 const initialState = {
@@ -7,7 +8,8 @@ const initialState = {
   questions: [],
   accessCode: '',
   userMode: '',
-  teamName: ''
+  teamName: '',
+  selectedTab: 'info'
 }
 
 const adventure = (state = initialState, action) => {
@@ -18,7 +20,13 @@ const adventure = (state = initialState, action) => {
         questions: action.questions,
         accessCode: action.accessCode,
         userMode: action.userMode,
-        teamName: action.teamName
+        teamName: action.teamName,
+        adventureName: action.adventureName
+      }
+    case UPDATE_ADVENTURE_TAB:
+      return {
+        ...state,
+        selectedTab: action.tabName
       }
     default:
       return state;

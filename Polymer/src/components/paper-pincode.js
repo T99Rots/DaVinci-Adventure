@@ -76,10 +76,11 @@ class PaperPincode extends LitElement {
 
   render() {
     return html`
-      <p ?hidden="${!this.label}">${this.label}</p>
+      <p ?hidden="${!this.label}" part="label">${this.label}</p>
       <div id="container">
         ${repeat(this.length || 6, (i) => html`
           <input 
+            part="input"
             maxlength="1"
             inputmode="numeric"
             value="${this._value[i] || ''}"
@@ -87,7 +88,8 @@ class PaperPincode extends LitElement {
             @keydown="${e => this._onKeyDown(e)}"
             @keyup="${e => this._onKeyUp(e, i)}"
             @input="${e => this._onInput(e, i)}"
-            @click=${e => this._onClick(e)}>
+            @click="${e => this._onClick(e)}"
+            @paste="${e => this._onPaste(e)}">
           </input>
         `)}
       </div>
@@ -162,6 +164,7 @@ class PaperPincode extends LitElement {
   }
 
   _onKeyUp(e, i) {
+    const oldVal = this.value;
     const elem = e.path[0];
     const previous = elem.previousElementSibling;
     if(e.key === 'Backspace') {
@@ -170,6 +173,9 @@ class PaperPincode extends LitElement {
         previous.selectionStart = 0;
         previous.selectionEnd = 1;
       }
+      delete this._value[i];
+      this.requestUpdate('value', oldVal);
+      this.dispatchEvent(new CustomEvent('value-changed', { detail: { value: this.value, isValid: this.isValid } }));
     }
   }
 
@@ -198,6 +204,41 @@ class PaperPincode extends LitElement {
     const elem = e.path[0];
     elem.selectionStart = 0;
     elem.selectionEnd = 1;
+  }
+
+  _onPaste(e) {
+    e.preventDefault();
+    const inputs = this.renderRoot.querySelectorAll('#container input');
+    const wasValid = this.isValid;
+    const oldVal = this.value;
+    const data = [...e.clipboardData.getData('text').replace(/[^\d]/g, '')];
+    for(let i = 0; i < this.length; i++) {
+      if(data[i]) {
+        this._value[i] = data[i];
+        inputs[i].value = data[i];
+      } else {
+        delete this._value[i];
+        inputs[i].value = '';
+      }
+    }
+    if(data.length > 0) {
+      if(this.isValid !== wasValid) {
+        const container = this.renderRoot.getElementById('container');
+        if(wasValid) {
+          container.removeAttribute('valid');
+        } else {
+          container.setAttribute('valid', '');
+        }
+      }
+      const focusInp = inputs[Math.min(data.length + 1, this.length) - 1];
+      focusInp.focus();
+      setTimeout(() => {
+        focusInp.selectionStart = 1;
+        focusInp.selectionEnd = 1;
+      })
+      this.requestUpdate('value', oldVal);
+      this.dispatchEvent(new CustomEvent('value-changed', { detail: { value: this.value, isValid: this.isValid } }));
+    }
   }
 }
 

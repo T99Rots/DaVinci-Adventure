@@ -64,17 +64,19 @@ export const loginWithAccessCode = (name, teamName) => async (dispatch, getState
           loginType,
           teamName: teamName1 = teamName,
           accessCode,
-          questions
+          questions,
+          adventureName
          } = await res.json();
         Object.assign(localStorage, {
           token,
           userId,
           loginType,
           loggedIn: true,
-          teamName1,
+          teamName: teamName1,
+          adventureName,
           questions: JSON.stringify(questions)
         });
-        dispatch(initAdventure(teamName1, loginType, questions, accessCode))
+        dispatch(initAdventure({adventureName, teamName: teamName1, loginType, questions, accessCode, userMode: loginType }))
         router.navigateId('root');
       } else {
         dispatch(setTeamError((await res.json()).message));
@@ -113,7 +115,7 @@ export const checkAccessCode = (accessCode) => async (dispatch, getState) => {
       });
       dispatch(updateLoading(false));
   
-      if(res.status === 200) {
+      if(res.status > 199 && res.status < 299) {
         const resBody = await res.json()
 
         dispatch({
@@ -123,10 +125,8 @@ export const checkAccessCode = (accessCode) => async (dispatch, getState) => {
           adventureName: resBody.adventureName,
           accessCode: +accessCode
         });
-      } else if(res.status === 400) {
-        dispatch(setAccessCodeError((await res.json()).message));
       } else {
-        dispatch(setAccessCodeError(errors.ACCESS_CODE_CHECK_FAILED));
+        dispatch(setAccessCodeError((await res.json()).message));
       }
     } catch(e) {
       console.error(e);
