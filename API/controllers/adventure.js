@@ -106,7 +106,8 @@ router.post('/join', async (ctx, next) => {
       accessCode,
       token: player.token,
       userId: player._id,
-      loginType: 'adventure-team-leader',
+      adventure: adventure._id,
+      teamLeader: true,
       ...cleanAdventureTemplate(adventure.template)
     }
   } else {
@@ -116,7 +117,8 @@ router.post('/join', async (ctx, next) => {
       teamName: team.name,
       token: player.token,
       userId: player._id,
-      loginType: 'adventure-player',
+      adventure: adventure._id,
+      teamLeader: false,
       ...cleanAdventureTemplate(adventure.template)
     }
   }

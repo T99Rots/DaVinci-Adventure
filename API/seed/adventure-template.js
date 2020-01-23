@@ -27,32 +27,56 @@ module.exports = async () => {
     const questionCount = faker.random.number(config.templates.questions);
     const template = {
       published: Math.random() > 0.12,
-      name: faker.lorem.sentence(),
-      questions: [],
+      name: faker.lorem.words(),
+      introduction: faker.lorem.paragraph(),
+      events: [],
       dateCreated: new Date(Date.now() - Math.floor(Math.random() * 1000*60*60*24*30)),
       userCreated: faker.random.arrayElement(users)._id
     };
     
     for(let i = 0; i < questionCount; i++) {
       const choiceCount = faker.random.number(config.templates.choices);
-      const question = {
-        location: faker.random.arrayElement(places),
-        question: faker.lorem.sentence(),
-        choices: []
+
+      const event = {
+        title: faker.lorem.sentence(),
+        type: Math.random() > 0.75? 'info': 'question',
+        triggers: []
       }
 
-      for(let i = 0; i < choiceCount; i++) {
-        question.choices.push({
-          _id: ObjectId(),
-          name: faker.lorem.sentence()
+      if(event.type === 'question') {
+        event.choices = [];
+        for(let i = 0; i < choiceCount; i++) {
+          event.choices.push({
+            _id: ObjectId(),
+            name: faker.lorem.sentence()
+          });
+        }
+        event.answer = faker.random.arrayElement(event.choices)._id;
+      } else {
+        event.body = faker.lorem.sentence();
+      }
+
+      if(Math.random() > .5) {
+        event.triggers.push({
+          type: 'location',
+          location: faker.random.arrayElement(places)
+        });
+      } else if(Math.random() > .7) {
+        event.triggers.push({
+          type: 'location',
+          location: faker.random.arrayElement(places)
+        }, {
+          type: 'time',
+          time: Math.floor((Math.random() * 90 * 60) + (15 * 60)) * 1000
+        });
+      } else {
+        event.triggers.push({
+          type: 'time',
+          time: Math.floor((Math.random() * 90 * 60) + (15 * 60)) * 1000
         });
       }
-
-      question.answer = faker.random.arrayElement(question.choices)._id;
-
-      template.questions.push(question);
+      template.events.push(event);
     }
-
     templates.push(template);
   }
 

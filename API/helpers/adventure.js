@@ -40,10 +40,13 @@ exports.lookupAccessCode = async (ctx) => {
 
 exports.cleanAdventureTemplate = (template) => ({
   adventureName: template.name,
-  questions: template.questions.map(question => ({
-    _id: question._id,
-    location: question.location,
-    question: question.question,
-    choices: question.choices
+  introduction: template.introduction,
+  events: template.events.map(event => ({
+    _id: event._id,
+    title: event.title,
+    body: event.body,
+    type: event.type,
+    choices: event.choices,
+    triggers: event.triggers
   }))
 });
