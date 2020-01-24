@@ -10,19 +10,19 @@ const cors = require('@gem-mine/cors').default;
 const errorHandler = require('koa-better-error-handler');
 const http = require('http');
 const WebSocket = require('ws');
-const { init: initBroadcast } = require('./ws-broadcast.js');
+// const { init: initBroadcast } = require('./ws-broadcast.js');
 
 (async () => {
   const app = new Koa();
 
   const server = http.createServer(app.callback());
 
-  const wss = new WebSocket.Server({ 
-    server,
-    path: '/broadcast'
-  });
+  // const wss = new WebSocket.Server({ 
+  //   server,
+  //   path: '/broadcast'
+  // });
 
-  initBroadcast(wss);
+  // initBroadcast(wss);
   
   await mongoose.connect(config.mongoURL, {
     useNewUrlParser: true,

@@ -1,4 +1,5 @@
 import { router } from '../routes';
+import { store } from '../store';
 
 export const CHECK_ACCESS_CODE_SUCCESS = 'CHECK_ACCESS_CODE_SUCCESS';
 export const CHECK_EMAIL_SUCCESS = 'CHECK_EMAIL_SUCCESS';
@@ -22,7 +23,7 @@ const errors = {
 }
 
 import { updateLoading } from './app';
-import { initAdventure } from '../actions/adventure';
+import { loadAdventure } from '../actions/adventure';
 
 const emailRegex = new RegExp([
   '(?:[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08',
@@ -58,25 +59,23 @@ export const loginWithAccessCode = (name, teamName) => async (dispatch, getState
       dispatch(updateLoading(false));
   
       if(res.status > 199 && res.status < 300) {
-        const { 
-          token,
-          userId,
-          loginType,
-          teamName: teamName1 = teamName,
-          accessCode,
-          questions,
-          adventureName
-         } = await res.json();
+        const resObj = await res.json();
         Object.assign(localStorage, {
-          token,
-          userId,
-          loginType,
+          ...resObj,
+          adventureStarted: true,
           loggedIn: true,
-          teamName: teamName1,
-          adventureName,
-          questions: JSON.stringify(questions)
+          loginType: 'adventure-player',
+          events: JSON.stringify(resObj.events)
         });
-        dispatch(initAdventure({adventureName, teamName: teamName1, loginType, questions, accessCode, userMode: loginType }))
+        store.dispatch(loadAdventure({
+          accessCode: resObj.accessCode,
+          teamLeader: resObj.teamLeader,
+          adventureName: resObj.adventureName,
+          introduction: resObj.introduction,
+          teamName: resObj.teamName,
+          events: resObj.events,
+          startTime: resObj.startTime
+        }))
         router.navigateId('root');
       } else {
         dispatch(setTeamError((await res.json()).message));

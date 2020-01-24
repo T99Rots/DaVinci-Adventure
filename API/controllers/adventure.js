@@ -103,10 +103,13 @@ router.post('/join', async (ctx, next) => {
     await adventure.save();
 
     ctx.body = {
+      teamName: team.name,
       accessCode,
       token: player.token,
       userId: player._id,
       adventure: adventure._id,
+      startTime: adventure.startTime,
+      duration: adventure.duration,
       teamLeader: true,
       ...cleanAdventureTemplate(adventure.template)
     }
@@ -118,6 +121,8 @@ router.post('/join', async (ctx, next) => {
       token: player.token,
       userId: player._id,
       adventure: adventure._id,
+      startTime: adventure.startTime,
+      duration: adventure.duration,
       teamLeader: false,
       ...cleanAdventureTemplate(adventure.template)
     }
