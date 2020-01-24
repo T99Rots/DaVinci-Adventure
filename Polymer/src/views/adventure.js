@@ -1,5 +1,6 @@
 import { html, css } from 'lit-element';
 import { PageViewElement } from '../components/page-view-element';
+import { repeat } from 'lit-html/directives/repeat';
 import { connect } from 'pwa-helpers/connect-mixin';
 
 import '@danielturner/google-map';
@@ -9,15 +10,22 @@ import '@polymer/iron-icons';
 import '@polymer/iron-icons/social-icons';
 import '@polymer/iron-icons/maps-icons';
 import '@polymer/paper-fab';
+import '@polymer/paper-menu-button';
+import '@polymer/paper-listbox';
+import '@polymer/paper-item';
+import '@polymer/paper-icon-button';
+import '@polymer/paper-item/paper-item-body';
+
 import '../components/bottom-sheet-page';
 import '../components/transforming-header';
 import '../components/page-slider';
+import '../components/event-card';
 
 import { mapsIcon } from '../components/icons';
 import SharedStyles, { shadows } from '../components/shared-styles';
 
 import { updateDrawer } from '../actions/app';
-import { updateTab } from '../actions/adventure';
+import { updateTab, updateMapType, loadAdventure } from '../actions/adventure';
 
 import { store } from '../store';
 
@@ -37,23 +45,6 @@ class AdventurePage extends connect(store)(PageViewElement) {
       css`
         :host {
           display: block;
-        }
-
-        h1 {
-          margin: 0;
-          padding-top: 20px;
-          letter-spacing: 5px;
-          text-align: center;
-        }
-
-        p {
-          margin: 0;
-          padding-top: 20px;
-          text-align: center;
-        }
-
-        google-map {
-          /* height: calc(100vh - 64px); */
         }
 
         .card {
@@ -116,9 +107,7 @@ class AdventurePage extends connect(store)(PageViewElement) {
           z-index: -1;
         }
         paper-fab {
-          position: fixed;
-          right: 16px;
-          bottom: 64px;
+          color: #555;
           box-shadow: 
             0 12px 16px 1px rgba(0, 0, 0, 0.14),
             0 4px 22px 3px rgba(0, 0, 0, 0.12),
@@ -138,6 +127,82 @@ class AdventurePage extends connect(store)(PageViewElement) {
         paper-fab[disabled] {
           box-shadow: none;
         }
+
+        #focus-map-button {
+          position: fixed;
+          bottom: 64px;
+          right: 16px;
+        }
+
+        #map-type-menu {
+          position: fixed;
+          top: 72px;
+          right: 16px;
+        }
+
+        #map-type-menu p {
+          margin: 0;      
+          font-size: 12px;
+          color: #555;  
+        }
+
+        #map-type-menu > div > p {
+          padding: 6px 10px;
+          font-size: 11px;
+          font-weight: 600;
+          text-transform: uppercase;
+        }
+
+        #map-type-menu .container {
+          display: flex;
+          padding: 0 7px;
+        }
+
+        #map-type-menu .container > div {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 0 3px;
+        }
+
+        #map-type-menu .container > div[selected] > .map-preview {
+          width: 44px;
+          height: 44px;
+          border: 2px solid var(--app-secondary-color);
+        }
+
+        #map-type-menu .container p {
+          padding: 8px 0 10px;
+        }
+
+        #map-type-menu .map-preview {
+          width: 48px;
+          height: 48px;
+          border-radius: 8px;
+          background: var(--app-primary-color);
+        }
+        paper-item p {
+          flex-grow: 1;
+          padding-left: 20px;
+        }
+        div[slide] > p {
+          margin: 10px 20px 10px;
+        }
+        div[slide] > h3 {
+          margin: 40px 20px 10px;
+          font-size: 18px;
+          color: #555;
+        }
+        div[slide] b {
+          color: #555;
+        }
+        div[slide] {
+          overflow: auto;
+          max-height: calc(100vh - 110px);
+        }
+        [slide="questions"] event-card:last-child {
+          padding-bottom: 60px;
+        }
 			`
 		]
 	}
@@ -155,25 +220,83 @@ class AdventurePage extends connect(store)(PageViewElement) {
         disable-street-view-control
         latitude="51.798363"
         longitude="4.679588"
+        min-zoom="15"
+        map-type="${this._mapType || 'roadmap'}"
         api-key="AIzaSyDl3wTiUNQMTzfRxxqgEe8bVJFdax52cZs">
+        <google-map-marker
+          latitude="51.798363"
+          longitude="4.679588">
+        </google-map-marker>
       </google-map>
-      <paper-fab>
-        <iron-icon icon="maps:my-location"></iron-icon>
-      </paper-fab>
+      <paper-menu-button id="map-type-menu" horizontal-align="right">
+        <paper-fab mini slot="dropdown-trigger" icon="maps:layers"></paper-fab>
+        <div slot="dropdown-content">
+          <p>Kaart type</p>
+          <div class="container">
+            <div 
+              ?selected="${this._mapType === 'roadmap'}"
+              @click="${() => this._setMapType('roadmap')}">
+              <div class="map-preview"></div>
+              <p>Standard</p>
+            </div>
+            <div 
+              ?selected="${this._mapType === 'satellite'}"
+              @click="${() => this._setMapType('satellite')}">
+              <div class="map-preview"></div>
+              <p>satelliet</p>
+            </div>
+            <div 
+              ?selected="${this._mapType === 'hybrid'}"
+              @click="${() => this._setMapType('hybrid')}">
+              <div class="map-preview"></div>
+              <p>hybride</p>
+            </div>
+          </div>
+        </div>
+      </paper-menu-button>
+      <paper-fab id="focus-map-button" icon="maps:my-location"></paper-fab>
       <!-- <div id="fake-maps"></div> -->
 
       <div id="bottom">
         <bottom-sheet-page ?opened="${['info', 'questions'].includes(this._selectedTab)}">
           <page-slider selected="${this._selectedTab}">
             <div slide="info">
-              Team ${this._teamName}
+              <h3>introduction</h3>
 
-              ${this._userMode === 'adventure-team-leader'? html`
-                Team toegangscode: ${this._accessCode} 
+              <p>${this._introduction}</p>
+
+              <p><b>Team:</b> ${this._teamName}</p>
+
+              <p>${this._userMode === 'adventure-team-leader'? html`
+                Toegangscode: ${this._accessCode} 
               `: ''}
+              </p>
+
+              <h3>Team spelers</h3>
+
+              <paper-listbox>                
+                <paper-item>
+                  <p>Player 1</p>
+                  <paper-icon-button icon="more-vert"></paper-icon-button>
+                </paper-item>
+                <paper-item>
+                  <p>Player 2</p>
+                  <paper-icon-button icon="more-vert"></paper-icon-button>
+                </paper-item>
+                <paper-item>
+                  <p>Player 3</p>
+                  <paper-icon-button icon="more-vert"></paper-icon-button>
+                </paper-item>
+                <paper-item>
+                  <p>Player 4</p>
+                  <paper-icon-button icon="more-vert"></paper-icon-button>
+                </paper-item>
+              </paper-listbox>
             </div>
             <div slide="questions" index="1">
-              this is questions
+              ${repeat(this._events.filter(event => event.visibility === 'visible'), e => e._id, event => html`
+                <event-card .event="${event}"></event-card>
+              `)}
             </div>
           </page-slider>
         </bottom-sheet-page>
@@ -201,23 +324,41 @@ class AdventurePage extends connect(store)(PageViewElement) {
     `
   }
 
+  firstUpdated() {
+    if(!this._stared) {
+      store.dispatch(loadAdventure());
+    }
+  }
+
+  _setMapType(type) {
+    this.renderRoot.getElementById('map-type-menu').opened = false;
+    store.dispatch(updateMapType(type));
+  }
+
   static get properties() {
     return {
+      _selectedTab: { type: String },
+      _mapType: { type: String },
       _accessCode: { type: String },
+      _teamLeader: { type: Boolean },
       _teamName: { type: String },
       _adventureName: { type: String },
-      _info: { type: String },
-      _selectedTab: { type: String },
-      _userMode: { type: String }
+      _introduction: { type: String },
+      _events: { type: Array },
+      _stared: { type: Boolean }
     }
   }
 
   stateChanged(state) {
-    this._accessCode = state.adventure.accessCode;
-    this._userMode = state.adventure.userMode;
     this._selectedTab = state.adventure.selectedTab;
-    this._adventureName = state.adventure.adventureName;
+    this._mapType = state.adventure.mapType;
+    this._accessCode = state.adventure.accessCode;
+    this._teamLeader = state.adventure.teamLeader;
     this._teamName = state.adventure.teamName;
+    this._adventureName = state.adventure.adventureName;
+    this._introduction = state.adventure.introduction;
+    this._events = state.adventure.events;
+    this._started = state.adventure.started;
   }
 }
 

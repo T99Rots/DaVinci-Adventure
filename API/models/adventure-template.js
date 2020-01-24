@@ -8,18 +8,25 @@ const AdventureTemplateSchema = new Schema({
   userCreated: { type: Schema.ObjectId, required: true, ref: 'User' },
   published: { type: Boolean, default: false, required: true },
   name: { type: String, required: true },
-  questions: [{
+  introduction: { type: String },
+  events: [{
     _id: { type: Schema.ObjectId, required: true, default: ObjectId },
-    location: {
-      long: { type: Number, required: true },
-      lat: { type: Number, required: true }
-    },
-    question: { type: String, required: true },
-    choices: [{
-      _id: { type: Schema.ObjectId, required: true, default: ObjectId },
-      name: { type: String, required: true }
+    type: { type: String, enum: ['question', 'info'], required: true, default: 'info' },
+    title: { type: String, required: true },
+    body:  { type: String },
+    triggers: [{
+      type: { type: String, enum: ['location', 'time'], required: true },
+      location: {
+        long: { type: Number },
+        lat: { type: Number }
+      },
+      time: { type: Number }
     }],
-    answer: { type: Schema.ObjectId, required: true }
+    choices: [{
+      _id: { type: Schema.ObjectId, default: ObjectId },
+      name: { type: String }
+    }],
+    answer: { type: Schema.ObjectId }
   }]
 });
 

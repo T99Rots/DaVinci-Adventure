@@ -16,7 +16,8 @@ const AdventureSchema = new Schema({
     creator: { type: Schema.ObjectId, required: true },
     players: [{
       _id: { type: Schema.ObjectId, required: true },
-      name: { type: String, required: true }
+      name: { type: String, required: true },
+      token: { type: String, required: true }
     }],
     answers: [{
       question: { type: Schema.ObjectId, required: true },
