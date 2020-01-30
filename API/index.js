@@ -9,7 +9,7 @@ const Router = require('koa-router');
 const cors = require('@gem-mine/cors').default;
 const errorHandler = require('koa-better-error-handler');
 const http = require('http');
-const WebSocket = require('ws');
+// const WebSocket = require('ws');
 // const { init: initBroadcast } = require('./ws-broadcast.js');
 
 (async () => {
