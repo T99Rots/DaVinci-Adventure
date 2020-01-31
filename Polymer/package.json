@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@danielturner/google-map": "^3.0.1-latest",
     "@material/mwc-textfield": "^0.12.0",
     "@polymer/app-layout": "^3.0.2",
     "@polymer/iron-icon": "^3.0.1",
@@ -26,6 +25,8 @@
     "@polymer/paper-radio-group": "^3.0.1",
     "@polymer/paper-tabs": "^3.1.0",
     "@webcomponents/webcomponentsjs": "^2.2.7",
+    "bezier-easing": "^2.1.0",
+    "geolocation-marker": "^2.0.5",
     "lit-element": "^2.1.0",
     "lit-html": "^1.1.0",
     "mapbox-gl": "^1.6.1",

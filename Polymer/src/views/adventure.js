@@ -3,7 +3,6 @@ import { PageViewElement } from '../components/page-view-element';
 import { repeat } from 'lit-html/directives/repeat';
 import { connect } from 'pwa-helpers/connect-mixin';
 
-import '@danielturner/google-map';
 import '@polymer/paper-tabs';
 import '@polymer/iron-icon';
 import '@polymer/iron-icons';
@@ -20,6 +19,7 @@ import '../components/bottom-sheet-page';
 import '../components/transforming-header';
 import '../components/page-slider';
 import '../components/event-card';
+import '../components/map-tiler';
 
 import { mapsIcon } from '../components/icons';
 import SharedStyles, { shadows } from '../components/shared-styles';
@@ -55,7 +55,7 @@ class AdventurePage extends connect(store)(PageViewElement) {
           bottom: 0;
         }
         
-        #fake-maps, google-map {
+        #fake-maps, map-tiler {
           position: fixed;
           top: 0;
           bottom: 0;
@@ -168,7 +168,7 @@ class AdventurePage extends connect(store)(PageViewElement) {
         #map-type-menu .container > div[selected] > .map-preview {
           width: 44px;
           height: 44px;
-          border: 2px solid var(--app-secondary-color);
+          border: 2px solid var(--app-primary-color);
         }
 
         #map-type-menu .container p {
@@ -179,7 +179,8 @@ class AdventurePage extends connect(store)(PageViewElement) {
           width: 48px;
           height: 48px;
           border-radius: 8px;
-          background: var(--app-primary-color);
+          background-size: cover;
+          background-position: center;
         }
         paper-item p {
           flex-grow: 1;
@@ -214,7 +215,7 @@ class AdventurePage extends connect(store)(PageViewElement) {
         ${this._adventureName}
         <span style="width: 48px"></span>
       </transforming-header>
-      <google-map 
+      <!-- <google-map 
         disable-default-ui
         disable-map-type-control
         disable-street-view-control
@@ -227,33 +228,34 @@ class AdventurePage extends connect(store)(PageViewElement) {
           latitude="51.798363"
           longitude="4.679588">
         </google-map-marker>
-      </google-map>
-      <paper-menu-button id="map-type-menu" horizontal-align="right">
+      </google-map> -->
+      <map-tiler></map-tiler>
+      <!-- <paper-menu-button id="map-type-menu" horizontal-align="right">
         <paper-fab mini slot="dropdown-trigger" icon="maps:layers"></paper-fab>
         <div slot="dropdown-content">
           <p>Kaart type</p>
           <div class="container">
-            <div 
+            <div
               ?selected="${this._mapType === 'roadmap'}"
               @click="${() => this._setMapType('roadmap')}">
-              <div class="map-preview"></div>
+              <div class="map-preview" style="background-image: url(/images/maps-standard-view.png)"></div>
               <p>Standard</p>
             </div>
             <div 
               ?selected="${this._mapType === 'satellite'}"
               @click="${() => this._setMapType('satellite')}">
-              <div class="map-preview"></div>
+              <div class="map-preview" style="background-image: url(/images/maps-satellite-view.png)"></div>
               <p>satelliet</p>
             </div>
             <div 
               ?selected="${this._mapType === 'hybrid'}"
               @click="${() => this._setMapType('hybrid')}">
-              <div class="map-preview"></div>
+              <div class="map-preview" style="background-image: url(/images/maps-satellite-view.png)"></div>
               <p>hybride</p>
             </div>
           </div>
         </div>
-      </paper-menu-button>
+      </paper-menu-button> -->
       <paper-fab id="focus-map-button" icon="maps:my-location"></paper-fab>
       <!-- <div id="fake-maps"></div> -->
 
@@ -325,15 +327,16 @@ class AdventurePage extends connect(store)(PageViewElement) {
   }
 
   firstUpdated() {
-    if(!this._stared) {
-      store.dispatch(loadAdventure());
-    }
+    const map = this.renderRoot.querySelector('map-tiler');
+    this.renderRoot.getElementById('focus-map-button').addEventListener('click', () => {
+      map.focusOnUserLocation();
+    });
   }
 
-  _setMapType(type) {
-    this.renderRoot.getElementById('map-type-menu').opened = false;
-    store.dispatch(updateMapType(type));
-  }
+  // _setMapType(type) {
+  //   this.renderRoot.getElementById('map-type-menu').opened = false;
+  //   store.dispatch(updateMapType(type));
+  // }
 
   static get properties() {
     return {
