@@ -25,7 +25,7 @@ import { mapsIcon } from '../components/icons';
 import SharedStyles, { shadows } from '../components/shared-styles';
 
 import { updateDrawer } from '../actions/app';
-import { updateTab, updateMapType, loadAdventure } from '../actions/adventure';
+import { updateTab, loadAdventure } from '../actions/adventure';
 
 import { store } from '../store';
 
@@ -215,50 +215,8 @@ class AdventurePage extends connect(store)(PageViewElement) {
         ${this._adventureName}
         <span style="width: 48px"></span>
       </transforming-header>
-      <!-- <google-map 
-        disable-default-ui
-        disable-map-type-control
-        disable-street-view-control
-        latitude="51.798363"
-        longitude="4.679588"
-        min-zoom="15"
-        map-type="${this._mapType || 'roadmap'}"
-        api-key="AIzaSyDl3wTiUNQMTzfRxxqgEe8bVJFdax52cZs">
-        <google-map-marker
-          latitude="51.798363"
-          longitude="4.679588">
-        </google-map-marker>
-      </google-map> -->
-      <map-tiler></map-tiler>
-      <!-- <paper-menu-button id="map-type-menu" horizontal-align="right">
-        <paper-fab mini slot="dropdown-trigger" icon="maps:layers"></paper-fab>
-        <div slot="dropdown-content">
-          <p>Kaart type</p>
-          <div class="container">
-            <div
-              ?selected="${this._mapType === 'roadmap'}"
-              @click="${() => this._setMapType('roadmap')}">
-              <div class="map-preview" style="background-image: url(/images/maps-standard-view.png)"></div>
-              <p>Standard</p>
-            </div>
-            <div 
-              ?selected="${this._mapType === 'satellite'}"
-              @click="${() => this._setMapType('satellite')}">
-              <div class="map-preview" style="background-image: url(/images/maps-satellite-view.png)"></div>
-              <p>satelliet</p>
-            </div>
-            <div 
-              ?selected="${this._mapType === 'hybrid'}"
-              @click="${() => this._setMapType('hybrid')}">
-              <div class="map-preview" style="background-image: url(/images/maps-satellite-view.png)"></div>
-              <p>hybride</p>
-            </div>
-          </div>
-        </div>
-      </paper-menu-button> -->
+      <map-tiler .events="${this._events}"></map-tiler>
       <paper-fab id="focus-map-button" icon="maps:my-location"></paper-fab>
-      <!-- <div id="fake-maps"></div> -->
-
       <div id="bottom">
         <bottom-sheet-page ?opened="${['info', 'questions'].includes(this._selectedTab)}">
           <page-slider selected="${this._selectedTab}">
@@ -331,12 +289,8 @@ class AdventurePage extends connect(store)(PageViewElement) {
     this.renderRoot.getElementById('focus-map-button').addEventListener('click', () => {
       map.focusOnUserLocation();
     });
+    store.dispatch(loadAdventure());
   }
-
-  // _setMapType(type) {
-  //   this.renderRoot.getElementById('map-type-menu').opened = false;
-  //   store.dispatch(updateMapType(type));
-  // }
 
   static get properties() {
     return {

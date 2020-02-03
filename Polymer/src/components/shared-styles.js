@@ -1,6 +1,9 @@
 import { css } from 'lit-element';
 
 export default css`
+  * {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+  }
   :host {
     --app-primary-color: #45a086;
     --app-secondary-color: #5ab4dd;

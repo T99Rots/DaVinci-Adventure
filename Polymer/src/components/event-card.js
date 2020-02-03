@@ -27,9 +27,14 @@ class EventCard extends LitElement {
           margin: 10px 20px 10px;
         }
 
+        paper-radio-group {
+          display: flex;
+          flex-direction: column;
+        }
+
         paper-radio-button {
           padding-left: 30px;
-          padding-right: 10px;
+          padding-right: 30px;
           --paper-radio-button-checked-color: var(--app-primary-color);
         }
       `
