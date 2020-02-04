@@ -1,5 +1,6 @@
 import { router } from '../routes';
 import { store } from '../store';
+import { apiURL } from '../helpers'
 
 export const CHECK_ACCESS_CODE_SUCCESS = 'CHECK_ACCESS_CODE_SUCCESS';
 export const CHECK_EMAIL_SUCCESS = 'CHECK_EMAIL_SUCCESS';
@@ -34,8 +35,6 @@ const emailRegex = new RegExp([
   '\\x0b\\x0c\\x0e-\\x7f])+)\\])'
 ].join(''));
 
-const api = location.protocol + '//' + location.hostname + ':9001';
-
 export const loginWithAccessCode = (name, teamName) => async (dispatch, getState) => {
   const state = getState();
   
@@ -49,7 +48,7 @@ export const loginWithAccessCode = (name, teamName) => async (dispatch, getState
         name
       }
       if(state.login.creatingTeam) body.teamName = teamName;
-      const res = await fetch(api + '/adventure/join', {
+      const res = await fetch(apiURL + 'adventure/join', {
         method: 'POST',
         body: JSON.stringify(body),
         headers: {
@@ -103,7 +102,7 @@ export const checkAccessCode = (accessCode) => async (dispatch, getState) => {
   if(/^\d{6,6}$/.test(accessCode)) {
     try {
       dispatch(updateLoading(true));
-      const res = await fetch(api + '/adventure/check-access-code', {
+      const res = await fetch(apiURL + 'adventure/check-access-code', {
         method: 'POST',
         body: JSON.stringify({
           accessCode: +accessCode
@@ -154,7 +153,7 @@ export const loginWithEmail = (email, password) => async (dispatch, getState) =>
   if(emailValid && passwordValid) {
     try {
       dispatch(updateLoading(true));
-      const res = await fetch(api + '/login/email', {
+      const res = await fetch(apiURL + 'login/email', {
         method: 'POST',
         body: JSON.stringify({
           email,

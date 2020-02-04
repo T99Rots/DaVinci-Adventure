@@ -27,8 +27,6 @@ router.post('/email', async (ctx, next) => {
   const email = ctx.request.body.email.toLowerCase().trim();
   const password = ctx.request.body.password;
 
-  console.log(email, password);
-
   ctx.assert(emailRegex.test(email), 400, errors.EMAIL_INVALID);
 
   const user = await User.findOne({ email });

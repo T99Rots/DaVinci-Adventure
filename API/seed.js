@@ -1,8 +1,8 @@
 console.clear()
 
 const mongoose = require('mongoose');
-const config = require('./config/default.json');
-const seedConfig = require('./config/seed.json');
+const config = require('./config/config');
+const seedConfig = require('./config/seed');
 const path = require('path');
 
 (async () => {

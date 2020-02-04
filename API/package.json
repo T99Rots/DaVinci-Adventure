@@ -6,7 +6,8 @@
   "scripts": {
     "start": "npx nodemon --inspect index.js",
     "seed": "node seed",
-    "seed:random": "node seed --mode random"
+    "seed:random": "node seed --mode random",
+    "serve:public": "npx nodemon --inspect index.js --public"
   },
   "keywords": [],
   "author": "",
@@ -22,10 +23,12 @@
     "koa-router": "^7.4.0",
     "lodash": "^4.17.15",
     "mongoose": "^5.8.1",
+    "node-fetch": "^2.6.0",
     "query-string": "^6.10.1",
-    "ws": "^7.2.1"
+    "yargs": "^15.1.0"
   },
   "devDependencies": {
+    "localtunnel": "^2.0.0",
     "nodemon": "^1.19.0"
   }
 }

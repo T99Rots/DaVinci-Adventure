@@ -1,6 +1,6 @@
 const keyStore = require('../models/key-store');
 
-const config = require('../config/default.json');
+const config = require('../config/config');
 const maxNum = (10 ** config.codeLength) - 1;
 
 const promise = (async () => {

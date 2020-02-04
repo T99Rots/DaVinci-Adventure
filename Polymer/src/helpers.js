@@ -1,4 +1,11 @@
-const apiURL = location.protocol + '//' + location.hostname + ':9001';
+let apiURL;
+if((location.hostname === 'localhost' && location.port === '9001') || location.hostname !== 'localhost') {
+  apiURL = location.protocol + '//' + location.host + '/api/';
+} else {
+  apiURL = location.protocol + '//' + location.hostname + ':9001/';
+}
+
+export { apiURL };
 
 export const apiRequest = (url, options = {}) => {
   const requestUrl = new URL(url, apiURL);

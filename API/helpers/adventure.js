@@ -1,6 +1,6 @@
 const Adventure = require('../models/adventure');
 global.adventureModel = Adventure
-const config = require('../config/default.json');
+const config = require('../config/config');
 
 const errors = {
   CODE_WRONG_FORMAT: 'Code moet een 6 cijfer getal zijn',
