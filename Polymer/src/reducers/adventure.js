@@ -17,6 +17,7 @@ const initialState = {
   adventureName: '',
   introduction: '',
   events: [],
+  area: [],
   error: ''
 }
 
@@ -32,6 +33,7 @@ const adventure = (state = initialState, action) => {
         adventureName: action.adventureName,
         introduction: action.introduction,
         events: action.events,
+        area: action.area,
         started: true
       };
     case LOAD_ADVENTURE_FAILED:

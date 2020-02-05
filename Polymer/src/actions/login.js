@@ -64,7 +64,8 @@ export const loginWithAccessCode = (name, teamName) => async (dispatch, getState
           adventureStarted: true,
           loggedIn: true,
           loginType: 'adventure-player',
-          events: JSON.stringify(resObj.events)
+          events: JSON.stringify(resObj.events),
+          area: JSON.stringify(resObj.area)
         });
         store.dispatch(loadAdventure({
           accessCode: resObj.accessCode,
@@ -73,8 +74,9 @@ export const loginWithAccessCode = (name, teamName) => async (dispatch, getState
           introduction: resObj.introduction,
           teamName: resObj.teamName,
           events: resObj.events,
-          startTime: resObj.startTime
-        }))
+          startTime: resObj.startTime,
+          area: resObj.area
+        }));
         router.navigateId('root');
       } else {
         dispatch(setTeamError((await res.json()).message));

@@ -41,6 +41,7 @@ exports.lookupAccessCode = async (ctx) => {
 exports.cleanAdventureTemplate = (template) => ({
   adventureName: template.name,
   introduction: template.introduction,
+  area: template.area,
   events: template.events.map(event => ({
     _id: event._id,
     title: event.title,

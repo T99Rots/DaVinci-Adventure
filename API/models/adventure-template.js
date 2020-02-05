@@ -9,6 +9,7 @@ const AdventureTemplateSchema = new Schema({
   published: { type: Boolean, default: false, required: true },
   name: { type: String, required: true },
   introduction: { type: String },
+  area: [[ Number ]],
   events: [{
     _id: { type: Schema.ObjectId, required: true, default: ObjectId },
     type: { type: String, enum: ['question', 'info'], required: true, default: 'info' },

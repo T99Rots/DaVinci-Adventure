@@ -1,5 +1,5 @@
 import { LitElement, html, css } from 'lit-element';
-import 'mapbox-gl/dist/mapbox-gl-dev.js';
+import 'mapbox-gl/dist/mapbox-gl.js';
 import 'bezier-easing/dist/bezier-easing'
 import { watchLocation } from '../gps-tracking'
 
@@ -177,6 +177,8 @@ class MapTiler extends LitElement {
         }
         markerElem.removeAttribute('hidden');
       });
+
+      this._addArea();
     });
   }
 
@@ -195,21 +197,50 @@ class MapTiler extends LitElement {
   constructor() {
     super();
     this._markers = {};
+    this._areaAdded = false;
   }
 
   static get properties() {
     return {
-      events: { type: Array }
+      events: { type: Array },
+      area: { type: Array }
     };
   }
   
+  _addArea() {
+    if(!this._areaAdded && this.area.length > 0 && this._map._loaded) {
+      this._areaAdded = true;
+      this._map.addSource('maine', {
+        'type': 'geojson',
+        'data': {
+          'type': 'Feature',
+          'geometry': {
+            'type': 'Polygon',
+            'coordinates': [
+              this.area.map(a => a.reverse())
+            ]
+          }
+        }
+      });
+      this._map.addLayer({
+        'id': 'maine',
+        'type': 'line',
+        'source': 'maine',
+        'layout': {},
+        'paint': {
+          'line-color': '#45a086',
+          'line-width': 4
+        }
+      });
+    }
+  }
+
   update(changedProps) {
     if(changedProps.has('events')) {
       for(const event of this.events) {
         if(event.visibility) {
-          const locationTrigger = event.triggers.find(t => t.type = 'location');
+          const locationTrigger = event.triggers.find(t => t.type === 'location');
           if(locationTrigger) {
-            console.log(locationTrigger);
             let marker = this._markers[event._id];
             if(!marker) {
               marker = document.createElement('div');
@@ -229,6 +260,7 @@ class MapTiler extends LitElement {
         }
       }
     }
+    if(changedProps.has('area')) this._addArea();
     super.update(changedProps);
   }
 }

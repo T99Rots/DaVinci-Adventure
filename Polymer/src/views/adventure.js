@@ -25,7 +25,7 @@ import { mapsIcon } from '../components/icons';
 import SharedStyles, { shadows } from '../components/shared-styles';
 
 import { updateDrawer } from '../actions/app';
-import { updateTab, loadAdventure } from '../actions/adventure';
+import { updateTab, loadAdventure, answerQuestion } from '../actions/adventure';
 
 import { store } from '../store';
 
@@ -215,7 +215,7 @@ class AdventurePage extends connect(store)(PageViewElement) {
         ${this._adventureName}
         <span style="width: 48px"></span>
       </transforming-header>
-      <map-tiler .events="${this._events}"></map-tiler>
+      <map-tiler .events="${this._events}" .area="${this._area}"></map-tiler>
       <paper-fab id="focus-map-button" icon="maps:my-location"></paper-fab>
       <div id="bottom">
         <bottom-sheet-page ?opened="${['info', 'questions'].includes(this._selectedTab)}">
@@ -255,7 +255,10 @@ class AdventurePage extends connect(store)(PageViewElement) {
             </div>
             <div slide="questions" index="1">
               ${repeat(this._events.filter(event => event.visibility === 'visible'), e => e._id, event => html`
-                <event-card .event="${event}"></event-card>
+                <event-card 
+                  .event="${event}"
+                  @question-answered="${(e) => store.dispatch(answerQuestion(event._id, e.detail))}">
+                </event-card>
               `)}
             </div>
           </page-slider>
@@ -290,6 +293,7 @@ class AdventurePage extends connect(store)(PageViewElement) {
       map.focusOnUserLocation();
     });
     store.dispatch(loadAdventure());
+    import('../upload-queue');
   }
 
   static get properties() {
@@ -302,7 +306,8 @@ class AdventurePage extends connect(store)(PageViewElement) {
       _adventureName: { type: String },
       _introduction: { type: String },
       _events: { type: Array },
-      _stared: { type: Boolean }
+      _stared: { type: Boolean },
+      _area: { type: Array }
     }
   }
 
@@ -316,6 +321,7 @@ class AdventurePage extends connect(store)(PageViewElement) {
     this._introduction = state.adventure.introduction;
     this._events = state.adventure.events;
     this._started = state.adventure.started;
+    this._area = state.adventure.area;
   }
 }
 

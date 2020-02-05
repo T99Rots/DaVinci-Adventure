@@ -1,6 +1,6 @@
 const faker = require('faker/locale/nl');
 const User = require('../models/users');
-const seedConfig = require('../config/seed.json');
+const seedConfig = require('../config/seed');
 
 const saltRounds = 10;
 

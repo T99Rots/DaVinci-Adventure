@@ -48,7 +48,7 @@ class EventCard extends LitElement {
         ${this.event.body}
       </p>
       ${this.event.type === 'question'? html`
-        <paper-radio-group selected="${this.event.answer}">
+        <paper-radio-group selected="${this.event.answer}" @selected-changed="${(e) => this._updateAnswer(e.detail.value)}">
           ${repeat(this.event.choices, choice => choice._id, choice => html`
             <paper-radio-button name="${choice._id}">
               ${choice.name}
@@ -57,6 +57,12 @@ class EventCard extends LitElement {
         </paper-radio-group>
       `: ''}
     `;
+  }
+
+  _updateAnswer(id) {
+    if(id && this.event.answer !== id) {
+      this.dispatchEvent(new CustomEvent('question-answered', {detail: id}));
+    }
   }
 
   static get properties () {

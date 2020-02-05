@@ -1,4 +1,5 @@
 import { startAdventure } from '../event-logic';
+import { apiRequest } from '../helpers';
 
 export const LOAD_ADVENTURE = 'LOAD_ADVENTURE';
 export const LOAD_ADVENTURE_FAILED = 'LOAD_ADVENTURE_FAILED';
@@ -26,6 +27,7 @@ export const loadAdventure = (args) => (dispatch, getState) => {
   } else {
     if(localStorage.adventureStarted) {
       const events = JSON.parse(localStorage.events);
+      const area = JSON.parse(localStorage.area);
       dispatch({
         type: LOAD_ADVENTURE,
         accessCode: +localStorage.accessCode || 0,
@@ -35,10 +37,12 @@ export const loadAdventure = (args) => (dispatch, getState) => {
         teamName: localStorage.teamName,
         startTime: localStorage.startTime,
         events,
+        area
       });
       startAdventure({
         startTime: localStorage.startTime,
-        events
+        events,
+        area
       });
     } else {
       dispatch({
@@ -56,6 +60,27 @@ export const answerQuestion = (questionId, answer) => (dispatch, getState) => {
     answer
   });
   localStorage.events = JSON.stringify(getState().adventure.events);
+  const queue = () => {
+    localStorage.answerQueue = JSON.stringify([...new Set([
+      ...JSON.stringify(localStorage.answerQueue || '[]'),
+      questionId
+    ])]);
+  }
+  if(navigator.onLine) {
+    try {
+      apiRequest('adventure/update-answer', {
+        method: 'POST',
+        body: {
+          questionId,
+          answer
+        }
+      })
+    } catch(e) {
+      queue();
+    }
+  } else {
+    queue();
+  }
 }
 
 export const updateTab = (tabName) => ({
