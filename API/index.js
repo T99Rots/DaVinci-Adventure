@@ -60,8 +60,14 @@ const fetch = require('node-fetch');
         if(ctx.request.url.startsWith('/api')) {
           ctx.response.status = 404;
         } else {
-          const res = await fetch('http://localhost:9000' + ctx.request.url);
+          const res = await fetch('http://localhost:9000' + ctx.request.url, {
+            headers: ctx.headers
+          });
           if(res.status === 200) {
+            // console.log(ctx.response.headers, res.headers);
+            ctx.response.set({
+              'content-type': res.headers.get('content-type')
+            });
             ctx.body = await res.text();
           }
         }
