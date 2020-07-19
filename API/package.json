@@ -21,7 +21,7 @@
     "koa-bodyparser": "^4.2.1",
     "koa-compose": "^4.1.0",
     "koa-router": "^7.4.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "mongoose": "^5.8.1",
     "node-fetch": "^2.6.0",
     "query-string": "^6.10.1",
